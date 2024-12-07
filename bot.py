@@ -6,24 +6,19 @@ from instagrapi import Client
 # Initialize the Instagram Client
 cl = Client()
 
-# save credentials from user 
-myusername = input('Type Username : ')
-mypassword = input('Type passsword : ')
-#mytargetusername = input('Type target username : ')
+# Save credentials from user
+myusername = input("Type Username: ")
+mypassword = input("Type Password: ")
 
-# Login with session
-def login_with_session():
+# Login function
+def login():
     try:
-        # Load session settings
-        cl.load_settings("session.json")
-        cl.login()
-        print("Logged in using saved session.")
+        # Log in directly with provided credentials
+        cl.login(myusername, mypassword)
+        print("Logged in successfully.")
     except Exception as e:
-        print(f"Failed to load session: {e}")
-        # Fallback to manual login if session fails
-        cl.login(myusername, mypassword)  # Replace with your credentials
-        cl.dump_settings("session.json")
-        print("New session saved.")
+        print(f"Login failed: {e}")
+        exit(1)  # Exit if login fails
 
 # Log follow activity to a file
 def log_activity(username):
@@ -36,8 +31,8 @@ def log_activity(username):
 def follow_random_users(daily_limit=50):
     followed = 0
 
-    # Fetch your followers as a pool of accounts to follow
-    user_id = cl.user_id_from_username("cristiano")  # Replace with your username
+    # Fetch a pool of accounts to follow
+    user_id = cl.user_id_from_username("cristiano")  # Replace with your target username
     print("Fetching followers...")
     followers = cl.user_followers(user_id, amount=500)
 
@@ -69,5 +64,5 @@ def follow_random_users(daily_limit=50):
 
 # Main script
 if __name__ == "__main__":
-    login_with_session()
+    login()
     follow_random_users()
