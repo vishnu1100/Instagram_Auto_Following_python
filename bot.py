@@ -6,6 +6,11 @@ from instagrapi import Client
 # Initialize the Instagram Client
 cl = Client()
 
+# save credentials from user 
+myusername = input('Type Username : ')
+mypassword = input('Type passsword : ')
+#mytargetusername = input('Type target username : ')
+
 # Login with session
 def login_with_session():
     try:
@@ -16,7 +21,7 @@ def login_with_session():
     except Exception as e:
         print(f"Failed to load session: {e}")
         # Fallback to manual login if session fails
-        cl.login("wdwewaerewd", "MA/E2LEM7/gi*?i")  # Replace with your credentials
+        cl.login(myusername, mypassword)  # Replace with your credentials
         cl.dump_settings("session.json")
         print("New session saved.")
 
@@ -32,7 +37,7 @@ def follow_random_users(daily_limit=50):
     followed = 0
 
     # Fetch your followers as a pool of accounts to follow
-    user_id = cl.user_id_from_username("wdwewaerewd")  # Replace with your username
+    user_id = cl.user_id_from_username("cristiano")  # Replace with your username
     print("Fetching followers...")
     followers = cl.user_followers(user_id, amount=500)
 
