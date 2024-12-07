@@ -3,42 +3,39 @@ import time
 from datetime import datetime
 from instagrapi import Client
 
-# Login to Instagram
+# Initialize the Instagram Client
 cl = Client()
-cl.login("wdwewaerewd", "MA/E2LEM7/gi*?i")  # Replace with your Instagram credentials
 
-# Safe API call wrapper
-def safe_api_call(func, *args, retries=3, **kwargs):
-    for attempt in range(retries):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            print(f"API call failed: {e}")
-            if attempt < retries - 1:
-                print(f"Retrying... ({attempt + 1}/{retries})")
-                time.sleep(2 ** attempt)
-            else:
-                raise
+# Login with session
+def login_with_session():
+    try:
+        # Load session settings
+        cl.load_settings("session.json")
+        cl.login()
+        print("Logged in using saved session.")
+    except Exception as e:
+        print(f"Failed to load session: {e}")
+        # Fallback to manual login if session fails
+        cl.login("wdwewaerewd", "MA/E2LEM7/gi*?i")  # Replace with your credentials
+        cl.dump_settings("session.json")
+        print("New session saved.")
 
-# Function to log activity
+# Log follow activity to a file
 def log_activity(username):
     with open("follow_log.txt", "a") as log_file:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         log_file.write(f"{timestamp} - Followed: {username}\n")
     print(f"Logged: {username}")
 
-# Function to follow random users
+# Follow random users
 def follow_random_users(daily_limit=50):
     followed = 0
 
-    # Fetch the user's followers safely
+    # Fetch your followers as a pool of accounts to follow
     user_id = cl.user_id_from_username("wdwewaerewd")  # Replace with your username
-    try:
-        followers = safe_api_call(cl.user_followers, user_id, amount=500)
-    except Exception as e:
-        print(f"Error fetching followers: {e}")
-        return
-    
+    print("Fetching followers...")
+    followers = cl.user_followers(user_id, amount=500)
+
     if not followers:
         print("No followers found. Exiting...")
         return
@@ -48,29 +45,24 @@ def follow_random_users(daily_limit=50):
             # Randomly select a user from the followers list
             user_id, user_data = random.choice(list(followers.items()))
             username = user_data.username
-            
+
             # Follow the user
-            safe_api_call(cl.user_follow, user_id)
+            cl.user_follow(user_id)
             print(f"Followed {username}")
             followed += 1
-            
+
             # Log the follow activity
             log_activity(username)
 
-            # Random delay between actions (20-40 minutes)
+            # Random delay between actions (20–40 minutes)
             delay = random.randint(1200, 2400)
-            print(f"Waiting for {delay // 60} minutes...")
+            print(f"Waiting for {delay // 60} minutes before the next action...")
             time.sleep(delay)
 
         except Exception as e:
             print(f"Error while following user: {e}")
-        
-        # Pause to simulate natural usage
-        current_hour = datetime.now().hour
-        if current_hour >= 0 and current_hour <= 6:  # Avoid activity between 12 AM - 6 AM
-            print("Sleeping for the night...")
-            time.sleep(3600 * (6 - current_hour))
 
-# Run the bot
+# Main script
 if __name__ == "__main__":
+    login_with_session()
     follow_random_users()
