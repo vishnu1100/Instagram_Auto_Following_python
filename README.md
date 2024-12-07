@@ -15,7 +15,7 @@ This bot automates Instagram activity by following 50 users daily from specified
 ## Setup
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your_username/instagram-bot.git
+   git clone https://github.com/vishnu1100/Instagram_Auto_Following_python.git
    cd instagram-bot
 Create and activate a virtual environment:
 
