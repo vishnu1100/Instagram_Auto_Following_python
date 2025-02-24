@@ -1,7 +1,15 @@
 import random
 import time
+import logging
 from datetime import datetime
 from instagrapi import Client
+
+# Configure logging
+logging.basicConfig(
+    filename='bot.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 # Initialize the Instagram Client
 cl = Client()
@@ -15,9 +23,9 @@ def login():
     try:
         # Log in directly with provided credentials
         cl.login(myusername, mypassword)
-        print("Logged in successfully.")
+        logging.info("Logged in successfully.")
     except Exception as e:
-        print(f"Login failed: {e}")
+        logging.error(f"Login failed: {e}")
         exit(1)  # Exit if login fails
 
 # Log follow activity to a file
@@ -25,7 +33,7 @@ def log_activity(username):
     with open("follow_log.txt", "a") as log_file:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         log_file.write(f"{timestamp} - Followed: {username}\n")
-    print(f"Logged: {username}")
+    logging.info(f"Logged: {username}")
 
 # Follow random users
 def follow_random_users(daily_limit=50):
@@ -33,11 +41,11 @@ def follow_random_users(daily_limit=50):
 
     # Fetch a pool of accounts to follow
     user_id = cl.user_id_from_username("cristiano")  # Replace with your target username
-    print("Fetching followers...")
+    logging.info("Fetching followers...")
     followers = cl.user_followers(user_id, amount=500)
 
     if not followers:
-        print("No followers found. Exiting...")
+        logging.warning("No followers found. Exiting...")
         return
 
     while followed < daily_limit:
@@ -48,7 +56,7 @@ def follow_random_users(daily_limit=50):
 
             # Follow the user
             cl.user_follow(user_id)
-            print(f"Followed {username}")
+            logging.info(f"Followed {username}")
             followed += 1
 
             # Log the follow activity
@@ -56,11 +64,11 @@ def follow_random_users(daily_limit=50):
 
             # Random delay between actions (20–40 minutes)
             delay = random.randint(1200, 2400)
-            print(f"Waiting for {delay // 60} minutes before the next action...")
+            logging.info(f"Waiting for {delay // 60} minutes before the next action...")
             time.sleep(delay)
 
         except Exception as e:
-            print(f"Error while following user: {e}")
+            logging.error(f"Error while following user: {e}")
 
 # Main script
 if __name__ == "__main__":
